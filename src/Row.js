@@ -7,8 +7,8 @@ import movieTrailer from "movie-trailer";
 const baseURL = "https://image.tmdb.org/t/p/original/";
 
 function Row({ title, fetchUrl, isLargeRow }) {
-  const [movies, setMovies] = useState([]); // initialized withe empty
-  const [trailerURL, setURL] = useState("");
+  const [movies, setMovies] = useState([]); // initialized with empty
+  const [trailerURL, setTrailerURL] = useState("");
 
   //the useEffect function runs when Row loads
   useEffect(() => {
@@ -30,14 +30,14 @@ function Row({ title, fetchUrl, isLargeRow }) {
     },
   };
 
-  const getURL = (movie) => {
+  const getTrailerURL = (movie) => {
     if (trailerURL) {
-      setURL("");
+      setTrailerURL("");
     } else {
       movieTrailer(movie?.name || movie?.title || movie?.original_name)
         .then((url) => {
           const urlParams = new URLSearchParams(new URL(url).search);
-          setURL(urlParams.get("v"));
+          setTrailerURL(urlParams.get("v"));
         })
         .catch((error) => console.log(error));
     }
@@ -57,7 +57,7 @@ function Row({ title, fetchUrl, isLargeRow }) {
               isLargeRow ? movie.poster_path : movie.backdrop_path
             }`}
             alt={movie.name}
-            onClick={getURL(movie)}
+            onClick={() => getTrailerURL(movie)}
           />
         ))}
       </div>
