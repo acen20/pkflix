@@ -2,19 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "./axios";
 import "./Row.css";
 import YouTube from "react-youtube";
+import movieTrailer from "movie-trailer";
 
 const baseURL = "https://image.tmdb.org/t/p/original/";
 
-const opts = {
-  height: "390",
-  width: "100%",
-  playerVars: {
-    autoplay: 1,
-  },
-};
-
 function Row({ title, fetchUrl, isLargeRow }) {
   const [movies, setMovies] = useState([]); // initialized withe empty
+  const [trailerURL, setURL] = useState("");
 
   //the useEffect function runs when Row loads
   useEffect(() => {
@@ -28,6 +22,26 @@ function Row({ title, fetchUrl, isLargeRow }) {
   /*empty ^ (here) means that it will only run once.
   if we pass a variable such as movies i.e. [movies],
   then this will load every time the movies change*/
+  const opts = {
+    height: "390",
+    width: "100%",
+    playerVars: {
+      autoplay: 1,
+    },
+  };
+
+  const getURL = (movie) => {
+    if (trailerURL) {
+      setURL("");
+    } else {
+      movieTrailer(movie?.name || movie?.title || movie?.original_name)
+        .then((url) => {
+          const urlParams = new URLSearchParams(new URL(url).search);
+          setURL(urlParams.get("v"));
+        })
+        .catch((error) => console.log(error));
+    }
+  };
 
   return (
     <div className="row">
@@ -43,10 +57,11 @@ function Row({ title, fetchUrl, isLargeRow }) {
               isLargeRow ? movie.poster_path : movie.backdrop_path
             }`}
             alt={movie.name}
+            onClick={getURL(movie)}
           />
         ))}
       </div>
-      <YouTube videoId={`ZvNPk87baKY`} opts={opts} />
+      {trailerURL && <YouTube videoId={`ZvNPk87baKY`} opts={opts} />}
     </div>
   );
 }
